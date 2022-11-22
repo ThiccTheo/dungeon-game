@@ -3,6 +3,14 @@ use std::collections::HashSet;
 
 use ggez::mint::Point2;
 
+#[derive(Debug, PartialEq)]
+enum Room {
+    Spawn,
+    Base,
+    Null,
+    Void,
+}
+
 pub struct Maze {
     width: usize,
     height: usize,
@@ -19,7 +27,7 @@ impl Maze {
         for row in 0..height {
             grid.push(Vec::with_capacity(width));
             for _ in 0..width {
-                grid[row].push(Room::Empty);
+                grid[row].push(Room::Null);
             }
         }
 
@@ -47,7 +55,6 @@ impl Maze {
         }
     }
 
-    // maybe reference instead of move?
     fn recurse(
         grid: &mut Vec<Vec<Room>>,
         mut history: Vec<Point2<usize>>,
@@ -55,83 +62,59 @@ impl Maze {
         pos: Point2<usize>,
         is_backtracking: bool,
     ) {
-        println!();
-
         if !is_backtracking {
-            history.push(pos.clone());
+            history.push(pos);
         }
-
-        visited.insert(pos.clone());
-
-        if grid[pos.y][pos.x] == Room::Empty {
-            if thread_rng().gen_range(0..5) == 0 {
-                grid[pos.y][pos.x] = Room::Null;
-            } else {
-                grid[pos.y][pos.x] = Room::Base;
-            }
-        }
+        visited.insert(pos);
 
         let height = grid.len();
         let width = grid[0].len();
-        let mut neighbors = Vec::<Point2<usize>>::new();
-
-        for y in 0..height {
-            for x in 0..width {
-                if pos != (Point2 { x, y }) {
-                    print!("{:?} ", grid[y][x]);
-                } else {
-                    print!("me_rn ");
-                }
-            }
-            println!();
-        }
-
         let Point2 { x, y } = pos;
 
-        // up
-        if !visited.contains(&Point2 { x, y: y - 1 }) && y as i8 - 1 >= 0 {
-            neighbors.push(Point2 { x, y: y - 1 });
+        if grid[y][x] == Room::Null {
+            if thread_rng().gen_range(0..3) == 0 {
+                grid[y][x] = Room::Void;
+            } else {
+                grid[y][x] = Room::Base;
+            }
         }
 
-        // down
-        if !visited.contains(&Point2 { x, y: y + 1 }) && y as i8 + 1 <= height as i8 - 1 {
-            neighbors.push(Point2 { x, y: y + 1 });
+        let mut neighbors = Vec::<Point2<usize>>::new();
+        let mut test_pt;
+
+        test_pt = Point2 { x, y: y - 1 };
+        if test_pt.y as i8 >= 0 && !visited.contains(&test_pt) {
+            neighbors.push(test_pt);
         }
 
-        // left
-        if !visited.contains(&Point2 { x: x - 1, y }) && x as i8 - 1 >= 0 {
-            neighbors.push(Point2 { x: x - 1, y });
+        test_pt = Point2 { x, y: y + 1 };
+        if test_pt.y as i8 <= height as i8 - 1 && !visited.contains(&test_pt) {
+            neighbors.push(test_pt);
         }
 
-        // right
-        if !visited.contains(&Point2 { x: x + 1, y }) && x as i8 + 1 <= width as i8 - 1 {
-            neighbors.push(Point2 { x: x + 1, y });
+        test_pt = Point2 { x: x - 1, y };
+        if test_pt.x as i8 >= 0 && !visited.contains(&test_pt) {
+            neighbors.push(test_pt);
         }
 
-        if visited.len() == width * height || history.len() == 0 {
+        test_pt = Point2 { x: x + 1, y };
+        if test_pt.x as i8 <= width as i8 - 1 && !visited.contains(&test_pt) {
+            neighbors.push(test_pt);
+        }
+
+        if visited.len() == width * height {
             return;
-        }
+        } else if grid[y][x] == Room::Void || neighbors.is_empty() {
+            history.pop();
 
-        if grid[pos.y][pos.x] == Room::Null || neighbors.len() == 0 {
-            drop(history.pop());
-            let new_pos = history.last().unwrap().clone();
-            return Self::recurse(grid, history, visited, new_pos, true);
+            if let Some(new_pos) = history.last().cloned() {
+                Self::recurse(grid, history, visited, new_pos, true)
+            }
         } else {
             let idx = thread_rng().gen_range(0..neighbors.len());
             let neighbor = neighbors.remove(idx);
 
-            return Self::recurse(grid, history, visited, neighbor, false);
+            Self::recurse(grid, history, visited, neighbor, false)
         }
     }
-}
-
-#[derive(Debug, PartialEq)]
-enum Room {
-    Spawn,
-    Shop,
-    Boss,
-    Enemy,
-    Null,
-    Empty,
-    Base,
 }
