@@ -1,8 +1,8 @@
-use std::collections::VecDeque;
-
-use ggez::event::EventHandler;
-
-use super::state::{Action, State};
+use {
+    super::state::{Action, State},
+    ggez::{event::EventHandler, Context},
+    std::collections::VecDeque,
+};
 
 pub struct App {
     states: Vec<Box<State>>,
@@ -20,8 +20,10 @@ impl App {
     pub fn add_action(&mut self, action: Action) {
         self.actions.push_back(action);
     }
+}
 
-    fn refresh(&mut self) {
+impl EventHandler<()> for App {
+    fn update(&mut self, ctx: &mut Context) -> Result<(), ()> {
         while let Some(action) = self.actions.pop_front() {
             match action {
                 Action::Create(state) => self.states.push(state),
@@ -32,20 +34,17 @@ impl App {
                 }
             }
         }
-    }
-}
 
-impl EventHandler<()> for App {
-    fn update(&mut self, ctx: &mut ggez::Context) -> Result<(), ()> {
-        self.refresh();
-        match self.states.last_mut().unwrap().update(ctx) {
+        let curr_state = self.states.last_mut().unwrap();
+        match curr_state.update(ctx) {
             Ok(()) => Ok(()),
             Err(_) => Ok(()),
         }
     }
 
-    fn draw(&mut self, ctx: &mut ggez::Context) -> Result<(), ()> {
-        match self.states.last_mut().unwrap().draw(ctx) {
+    fn draw(&mut self, ctx: &mut Context) -> Result<(), ()> {
+        let curr_state = self.states.last_mut().unwrap();
+        match curr_state.draw(ctx) {
             Ok(()) => Ok(()),
             Err(action) => {
                 self.add_action(action);

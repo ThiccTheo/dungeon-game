@@ -687,7 +687,6 @@ name = "dungeon-game"
 version = "0.1.0"
 dependencies = [
  "ggez",
- "tlecs",
 ]
 
 [[package]]
@@ -2412,12 +2411,6 @@ name = "tinyvec_macros"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
-
-[[package]]
-name = "tlecs"
-version = "0.1.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8bb02a0ddfa1987afadb503bad6c5e4f102b2fea296325337e9ac563365b8ce2"
 
 [[package]]
 name = "toml"

@@ -1,5 +1,7 @@
-use ggez::event::EventHandler;
-use std::fmt::{Debug, Result as FmtResult};
+use {
+    ggez::event::EventHandler,
+    std::fmt::{Debug, Result as FmtResult},
+};
 
 pub type State = dyn EventHandler<Action>;
 
