@@ -1,7 +1,10 @@
-use ggez::{
-    graphics::{Canvas, Color, DrawMode, DrawParam, FillOptions, Mesh, MeshBuilder, Rect},
-    input::keyboard::KeyCode,
-    Context,
+use {
+    super::game_object::GameObject,
+    ggez::{
+        graphics::{Canvas, Color, DrawMode, DrawParam, FillOptions, Mesh, MeshBuilder, Rect},
+        input::keyboard::KeyCode,
+        Context,
+    },
 };
 
 pub struct Player {
@@ -37,8 +40,10 @@ impl Player {
 
         Self { body, camera, mesh }
     }
+}
 
-    pub fn update(&mut self, ctx: &mut Context, dt: f32) {
+impl GameObject for Player {
+    fn update(&mut self, ctx: &mut Context, dt: f32) {
         let offset = 100.0 * dt;
 
         if ctx.keyboard.is_key_pressed(KeyCode::W) {
@@ -62,7 +67,7 @@ impl Player {
         }
     }
 
-    pub fn draw(&mut self, _ctx: &mut Context, canvas: &mut Canvas) {
+    fn draw(&mut self, _ctx: &mut Context, canvas: &mut Canvas) {
         canvas.set_screen_coordinates(self.camera.clone());
         canvas.draw(&self.mesh, DrawParam::default().dest(self.body.point()));
     }

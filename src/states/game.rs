@@ -1,6 +1,8 @@
+use crate::misc::maze::Maze;
+
 use {
     super::state::Action,
-    crate::game_objects::player::Player,
+    crate::game_objects::{game_object::GameObject, player::Player},
     ggez::{
         event::EventHandler,
         graphics::{Canvas, Color},
@@ -9,27 +11,40 @@ use {
 };
 
 pub struct Game {
-    player: Player,
+    game_objects: Vec<Box<dyn GameObject>>,
+    maze: Maze,
 }
 
 impl Game {
     pub fn new(ctx: &mut Context) -> Self {
-        Self {
-            player: Player::new(ctx),
-        }
+        let mut game_objects = Vec::<Box<dyn GameObject>>::new();
+        game_objects.push(Box::new(Player::new(ctx)));
+
+        let maze = Maze::new(5, 5);
+        maze.print();
+
+        Self { game_objects, maze }
     }
 }
 
 impl EventHandler<Action> for Game {
     fn update(&mut self, ctx: &mut Context) -> Result<(), Action> {
         let dt = ctx.time.delta().as_secs_f32();
-        self.player.update(ctx, dt);
+
+        for game_object in self.game_objects.iter_mut() {
+            game_object.update(ctx, dt);
+        }
+
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut Context) -> Result<(), Action> {
         let mut canvas = Canvas::from_frame(&ctx.gfx, Color::BLACK);
-        self.player.draw(ctx, &mut canvas);
+
+        for game_object in self.game_objects.iter_mut() {
+            game_object.draw(ctx, &mut canvas);
+        }
+
         canvas.finish(&mut ctx.gfx).unwrap();
         Ok(())
     }
