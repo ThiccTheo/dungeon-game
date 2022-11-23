@@ -1,6 +1,7 @@
-use std::path::PathBuf;
-
-use ggez::conf::{WindowMode, WindowSetup};
+use {
+    ggez::conf::{WindowMode, WindowSetup},
+    std::path::PathBuf,
+};
 
 mod states {
     pub mod app;
@@ -25,7 +26,7 @@ use {
 fn main() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let mut asset_path = root.clone();
-    asset_path.push("assets");
+    asset_path.push("assets\\imgs");
 
     let ctx_builder =
         ContextBuilder::new("Dungeon Game", "Theo Lee and Daniel Li").add_resource_path(asset_path);

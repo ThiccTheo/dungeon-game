@@ -1,8 +1,9 @@
-use crate::misc::maze::Maze;
-
 use {
     super::state::Action,
-    crate::game_objects::{game_object::GameObject, player::Player},
+    crate::{
+        game_objects::{game_object::GameObject, player::Player},
+        misc::maze::Maze,
+    },
     ggez::{
         event::EventHandler,
         graphics::{Canvas, Color},
@@ -20,7 +21,7 @@ impl Game {
         let mut game_objects = Vec::<Box<dyn GameObject>>::new();
         game_objects.push(Box::new(Player::new(ctx)));
 
-        let maze = Maze::new(5, 5);
+        let maze = Maze::new(3, 3);
         maze.print();
 
         Self { game_objects, maze }

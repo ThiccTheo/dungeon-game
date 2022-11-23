@@ -1,10 +1,11 @@
-use rand::{thread_rng, Rng};
-use std::collections::HashSet;
-
-use ggez::mint::Point2;
+use {
+    ggez::mint::Point2,
+    rand::{thread_rng, Rng},
+    std::collections::HashSet,
+};
 
 #[derive(Debug, PartialEq)]
-enum Room {
+pub enum Room {
     Spawn,
     Base,
     Null,
@@ -12,15 +13,19 @@ enum Room {
 }
 
 pub struct Maze {
-    width: usize,
-    height: usize,
-    grid: Vec<Vec<Room>>,
+    pub width: usize,
+    pub height: usize,
+    pub grid: Vec<Vec<Room>>,
 }
 
 impl Maze {
-    /// Only pass odd width and height :O
-    pub fn new(width: usize, height: usize) -> Self {
-        let spawn_pos = Point2 { x: 2, y: 2 };
+    pub fn new(mut width: usize, mut height: usize) -> Self {
+        width = width.clamp(3, 5);
+        height = height.clamp(3, 5);
+        let spawn_pos = Point2 {
+            x: width / 2,
+            y: height / 2,
+        };
 
         let mut grid = Vec::<Vec<Room>>::with_capacity(height);
 
@@ -37,7 +42,6 @@ impl Maze {
         let visited = HashSet::<Point2<usize>>::new();
 
         Self::recurse(&mut grid, history, visited, spawn_pos, false);
-        println!();
 
         Maze {
             width,
