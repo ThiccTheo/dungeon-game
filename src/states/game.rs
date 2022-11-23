@@ -6,13 +6,15 @@ use {
     },
     ggez::{
         event::EventHandler,
-        graphics::{Canvas, Color},
+        graphics::{Canvas, Color, Image},
         Context,
     },
+    std::collections::HashMap,
 };
 
 pub struct Game {
     game_objects: Vec<Box<dyn GameObject>>,
+    textures: HashMap<String, Image>,
     maze: Maze,
 }
 
@@ -24,7 +26,21 @@ impl Game {
         let maze = Maze::new(3, 3);
         maze.print();
 
-        Self { game_objects, maze }
+        let mut textures = HashMap::new();
+        textures.insert(
+            Player::TEXTURE_ID.to_string(),
+            Image::from_path(
+                &ctx.gfx,
+                format!("\\{}.png", Player::TEXTURE_ID.to_string()),
+            )
+            .unwrap(),
+        );
+
+        Self {
+            game_objects,
+            textures,
+            maze,
+        }
     }
 }
 
@@ -43,7 +59,11 @@ impl EventHandler<Action> for Game {
         let mut canvas = Canvas::from_frame(&ctx.gfx, Color::BLACK);
 
         for game_object in self.game_objects.iter_mut() {
-            game_object.draw(ctx, &mut canvas);
+            game_object.draw(
+                ctx,
+                &mut canvas,
+                self.textures.get(&game_object.texture_id()).unwrap(),
+            );
         }
 
         canvas.finish(&mut ctx.gfx).unwrap();

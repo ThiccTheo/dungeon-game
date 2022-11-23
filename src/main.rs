@@ -1,8 +1,3 @@
-use {
-    ggez::conf::{WindowMode, WindowSetup},
-    std::path::PathBuf,
-};
-
 mod states {
     pub mod app;
     pub mod game;
@@ -19,8 +14,13 @@ mod game_objects {
 }
 
 use {
-    ggez::{event::run, ContextBuilder},
+    ggez::{
+        conf::{WindowMode, WindowSetup},
+        event::run,
+        ContextBuilder,
+    },
     states::{app::App, game::Game, state::Action},
+    std::path::PathBuf,
 };
 
 fn main() {
@@ -31,12 +31,12 @@ fn main() {
     let ctx_builder =
         ContextBuilder::new("Dungeon Game", "Theo Lee and Daniel Li").add_resource_path(asset_path);
 
-    let window_mode = WindowMode::default().dimensions(1280.0, 720.0);
-    let window_setup = WindowSetup::default().title("Dungeon Game").vsync(true);
+    let mode = WindowMode::default().dimensions(1280.0, 720.0);
+    let setup = WindowSetup::default().title("Dungeon Game");
 
     let (mut ctx, event_loop) = ctx_builder
-        .window_mode(window_mode)
-        .window_setup(window_setup)
+        .window_mode(mode)
+        .window_setup(setup)
         .build()
         .unwrap();
 

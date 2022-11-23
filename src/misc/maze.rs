@@ -41,7 +41,7 @@ impl Maze {
         let history = Vec::<Point2<usize>>::new();
         let visited = HashSet::<Point2<usize>>::new();
 
-        Self::recurse(&mut grid, history, visited, spawn_pos, false);
+        Self::generate(&mut grid, history, visited, spawn_pos, false);
 
         Maze {
             width,
@@ -59,7 +59,7 @@ impl Maze {
         }
     }
 
-    fn recurse(
+    fn generate(
         grid: &mut Vec<Vec<Room>>,
         mut history: Vec<Point2<usize>>,
         mut visited: HashSet<Point2<usize>>,
@@ -112,13 +112,13 @@ impl Maze {
             history.pop();
 
             if let Some(new_pos) = history.last().cloned() {
-                Self::recurse(grid, history, visited, new_pos, true)
+                Self::generate(grid, history, visited, new_pos, true)
             }
         } else {
             let idx = thread_rng().gen_range(0..neighbors.len());
             let neighbor = neighbors.remove(idx);
 
-            Self::recurse(grid, history, visited, neighbor, false)
+            Self::generate(grid, history, visited, neighbor, false)
         }
     }
 }

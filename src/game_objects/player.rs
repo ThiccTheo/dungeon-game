@@ -1,7 +1,9 @@
 use {
     super::game_object::GameObject,
     ggez::{
-        graphics::{Canvas, Color, DrawMode, DrawParam, FillOptions, Mesh, MeshBuilder, Rect},
+        graphics::{
+            Canvas, Color, DrawMode, DrawParam, FillOptions, Image, Mesh, MeshBuilder, Rect,
+        },
         input::keyboard::KeyCode,
         Context,
     },
@@ -14,6 +16,8 @@ pub struct Player {
 }
 
 impl Player {
+    pub const TEXTURE_ID: &str = "player";
+
     pub fn new(ctx: &mut Context) -> Self {
         let (res_x, res_y) = ctx.gfx.size();
 
@@ -67,8 +71,12 @@ impl GameObject for Player {
         }
     }
 
-    fn draw(&mut self, _ctx: &mut Context, canvas: &mut Canvas) {
+    fn draw(&mut self, _ctx: &mut Context, canvas: &mut Canvas, texture: &Image) {
         canvas.set_screen_coordinates(self.camera.clone());
         canvas.draw(&self.mesh, DrawParam::default().dest(self.body.point()));
+    }
+
+    fn texture_id(&self) -> String {
+        Self::TEXTURE_ID.to_string()
     }
 }
