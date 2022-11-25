@@ -1,6 +1,6 @@
 use {
     ggez::event::EventHandler,
-    std::fmt::{Debug, Result as FmtResult},
+    std::fmt::{Debug, Formatter, Result as FmtResult},
 };
 
 pub type State = dyn EventHandler<Action>;
@@ -12,7 +12,7 @@ pub enum Action {
 }
 
 impl Debug for Action {
-    fn fmt(&self, _: &mut std::fmt::Formatter<'_>) -> FmtResult {
+    fn fmt(&self, _: &mut Formatter<'_>) -> FmtResult {
         todo!();
     }
 }

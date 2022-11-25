@@ -19,19 +19,16 @@ pub struct Maze {
 }
 
 impl Maze {
-    pub fn new(mut width: usize, mut height: usize) -> Self {
-        width = width.clamp(3, 5);
-        height = height.clamp(3, 5);
-        let spawn_pos = Point2 {
-            x: width / 2,
-            y: height / 2,
-        };
+    pub fn new(mut w: usize, mut h: usize) -> Self {
+        w = w.clamp(3, 5);
+        h = h.clamp(3, 5);
+        let spawn_pos = Point2 { x: w / 2, y: h / 2 };
 
-        let mut grid = Vec::<Vec<Room>>::with_capacity(height);
+        let mut grid = Vec::<Vec<Room>>::with_capacity(h);
 
-        for row in 0..height {
-            grid.push(Vec::with_capacity(width));
-            for _ in 0..width {
+        for row in 0..h {
+            grid.push(Vec::with_capacity(w));
+            for _ in 0..w {
                 grid[row].push(Room::Null);
             }
         }
@@ -44,8 +41,8 @@ impl Maze {
         Self::generate(&mut grid, history, visited, spawn_pos, false);
 
         Maze {
-            width,
-            height,
+            width: w,
+            height: h,
             grid,
         }
     }
@@ -71,8 +68,7 @@ impl Maze {
         }
         visited.insert(pos);
 
-        let height = grid.len();
-        let width = grid[0].len();
+        let (w, h) = (grid.len(), grid[0].len());
         let Point2 { x, y } = pos;
 
         if grid[y][x] == Room::Null {
@@ -92,7 +88,7 @@ impl Maze {
         }
 
         test_pt = Point2 { x, y: y + 1 };
-        if test_pt.y as i8 <= height as i8 - 1 && !visited.contains(&test_pt) {
+        if test_pt.y as i8 <= h as i8 - 1 && !visited.contains(&test_pt) {
             neighbors.push(test_pt);
         }
 
@@ -102,11 +98,11 @@ impl Maze {
         }
 
         test_pt = Point2 { x: x + 1, y };
-        if test_pt.x as i8 <= width as i8 - 1 && !visited.contains(&test_pt) {
+        if test_pt.x as i8 <= w as i8 - 1 && !visited.contains(&test_pt) {
             neighbors.push(test_pt);
         }
 
-        if visited.len() == width * height {
+        if visited.len() == w * h {
             return;
         } else if grid[y][x] == Room::Void || neighbors.is_empty() {
             history.pop();

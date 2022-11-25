@@ -35,21 +35,19 @@ impl EventHandler<()> for App {
             }
         }
 
-        let curr_state = self.states.last_mut().unwrap();
-        match curr_state.update(ctx) {
-            Ok(()) => Ok(()),
-            Err(_) => Ok(()),
-        }
+        let cur_state = self.states.last_mut().unwrap();
+        cur_state.update(ctx).unwrap();
+
+        Ok(())
     }
 
     fn draw(&mut self, ctx: &mut Context) -> Result<(), ()> {
-        let curr_state = self.states.last_mut().unwrap();
-        match curr_state.draw(ctx) {
-            Ok(()) => Ok(()),
-            Err(action) => {
-                self.add_action(action);
-                Ok(())
-            }
+        let cur_state = self.states.last_mut().unwrap();
+
+        if let Err(action) = cur_state.draw(ctx) {
+            self.add_action(action);
         }
+
+        Ok(())
     }
 }

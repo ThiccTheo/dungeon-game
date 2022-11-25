@@ -5,6 +5,7 @@ mod states {
 }
 
 mod misc {
+    pub mod math;
     pub mod maze;
 }
 
@@ -25,16 +26,16 @@ use {
 
 fn main() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let mut asset_path = root.clone();
-    asset_path.push("assets\\imgs");
+    let mut path = root.clone();
+    path.push("assets\\images");
 
     let ctx_builder =
-        ContextBuilder::new("Dungeon Game", "Theo Lee and Daniel Li").add_resource_path(asset_path);
+        ContextBuilder::new("Dungeon Game", "Theo Lee and Daniel Li").add_resource_path(path);
 
     let mode = WindowMode::default().dimensions(1280.0, 720.0);
     let setup = WindowSetup::default().title("Dungeon Game");
 
-    let (mut ctx, event_loop) = ctx_builder
+    let (mut ctx, e_loop) = ctx_builder
         .window_mode(mode)
         .window_setup(setup)
         .build()
@@ -42,5 +43,5 @@ fn main() {
 
     let mut app = App::new();
     app.add_action(Action::Create(Box::new(Game::new(&mut ctx))));
-    run(ctx, event_loop, app);
+    run(ctx, e_loop, app);
 }

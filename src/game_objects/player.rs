@@ -1,10 +1,9 @@
 use {
     super::game_object::GameObject,
     ggez::{
-        graphics::{
-            Canvas, Color, DrawMode, DrawParam, FillOptions, Image, Mesh, MeshBuilder, Rect,
-        },
+        graphics::{Canvas, DrawParam, Image, Rect},
         input::keyboard::KeyCode,
+        mint::Point2,
         Context,
     },
 };
@@ -12,37 +11,29 @@ use {
 pub struct Player {
     body: Rect,
     camera: Rect,
-    mesh: Mesh,
+    scale: Point2<f32>,
 }
 
 impl Player {
     pub const TEXTURE_ID: &str = "player";
 
     pub fn new(ctx: &mut Context) -> Self {
-        let (res_x, res_y) = ctx.gfx.size();
+        let (w, h) = ctx.gfx.size();
 
         let body = Rect::new(0.0, 0.0, 32.0, 32.0);
 
-        let camera = Rect::new(
-            body.x - res_x / 2.0 + body.w / 2.0,
-            body.y - res_y / 2.0 + body.h / 2.0,
-            res_x,
-            res_y,
+        let cam = Rect::new(
+            body.x - w / 2.0 + body.w / 2.0,
+            body.y - h / 2.0 + body.h / 2.0,
+            w,
+            h,
         );
 
-        let mesh = Mesh::from_data(
-            &ctx.gfx,
-            MeshBuilder::new()
-                .rectangle(
-                    DrawMode::Fill(FillOptions::DEFAULT),
-                    body.clone(),
-                    Color::RED,
-                )
-                .unwrap()
-                .build(),
-        );
-
-        Self { body, camera, mesh }
+        Self {
+            body,
+            camera: cam,
+            scale: Point2 { x: 1.0, y: 1.0 },
+        }
     }
 }
 
@@ -63,17 +54,31 @@ impl GameObject for Player {
         if ctx.keyboard.is_key_pressed(KeyCode::A) {
             self.body.x -= offset;
             self.camera.x -= offset;
+            self.scale.x = -1.0;
         }
 
         if ctx.keyboard.is_key_pressed(KeyCode::D) {
             self.body.x += offset;
             self.camera.x += offset;
+            self.scale.x = 1.0;
         }
     }
 
-    fn draw(&mut self, _ctx: &mut Context, canvas: &mut Canvas, texture: &Image) {
+    fn draw(&mut self, canvas: &mut Canvas, img: &Image) {
         canvas.set_screen_coordinates(self.camera.clone());
-        canvas.draw(&self.mesh, DrawParam::default().dest(self.body.point()));
+        canvas.draw(
+            img,
+            DrawParam::default()
+                .dest(if self.scale.x == 1.0 {
+                    self.body.point()
+                } else {
+                    Point2 {
+                        x: self.body.right(),
+                        y: self.body.y,
+                    }
+                })
+                .scale(self.scale),
+        );
     }
 
     fn texture_id(&self) -> String {

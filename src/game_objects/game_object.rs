@@ -5,6 +5,6 @@ use ggez::{
 
 pub trait GameObject {
     fn update(&mut self, ctx: &mut Context, dt: f32);
-    fn draw(&mut self, ctx: &mut Context, canvas: &mut Canvas, texture: &Image);
+    fn draw(&mut self, canvas: &mut Canvas, img: &Image);
     fn texture_id(&self) -> String;
 }
