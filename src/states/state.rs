@@ -1,6 +1,9 @@
 use {
-    ggez::event::EventHandler,
-    std::fmt::{Debug, Formatter, Result as FmtResult},
+    ggez::{event::EventHandler, graphics::Image, Context},
+    std::{
+        collections::HashMap,
+        fmt::{Debug, Formatter, Result as FmtResult},
+    },
 };
 
 pub type State = dyn EventHandler<Action>;

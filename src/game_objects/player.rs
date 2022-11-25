@@ -1,7 +1,11 @@
+use ggez::graphics::InstanceArray;
+
+use crate::states::app::App;
+
 use {
     super::game_object::GameObject,
     ggez::{
-        graphics::{Canvas, DrawParam, Image, Rect},
+        graphics::{Canvas, DrawParam, Rect},
         input::keyboard::KeyCode,
         mint::Point2,
         Context,
@@ -17,16 +21,14 @@ pub struct Player {
 impl Player {
     pub const TEXTURE_ID: &str = "player";
 
-    pub fn new(ctx: &mut Context) -> Self {
-        let (w, h) = ctx.gfx.size();
-
+    pub fn new() -> Self {
         let body = Rect::new(0.0, 0.0, 32.0, 32.0);
 
         let cam = Rect::new(
-            body.x - w / 2.0 + body.w / 2.0,
-            body.y - h / 2.0 + body.h / 2.0,
-            w,
-            h,
+            body.x - App::WIDTH / 2.0 + body.w / 2.0,
+            body.y - App::HEIGHT / 2.0 + body.h / 2.0,
+            App::WIDTH,
+            App::HEIGHT,
         );
 
         Self {
@@ -39,7 +41,7 @@ impl Player {
 
 impl GameObject for Player {
     fn update(&mut self, ctx: &mut Context, dt: f32) {
-        let offset = 100.0 * dt;
+        let offset = (100.0 * dt).round();
 
         if ctx.keyboard.is_key_pressed(KeyCode::W) {
             self.body.y -= offset;
@@ -64,12 +66,12 @@ impl GameObject for Player {
         }
     }
 
-    fn draw(&mut self, canvas: &mut Canvas, img: &Image) {
+    fn draw(&mut self, canvas: &mut Canvas, batch: &mut InstanceArray) {
         canvas.set_screen_coordinates(self.camera.clone());
-        canvas.draw(
-            img,
+
+        batch.push(
             DrawParam::default()
-                .dest(if self.scale.x == 1.0 {
+                .dest(if self.scale.x > 0.0 {
                     self.body.point()
                 } else {
                     Point2 {

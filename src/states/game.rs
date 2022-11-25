@@ -1,46 +1,49 @@
+use ggez::graphics::{InstanceArray, DrawParam};
+
 use {
     super::state::Action,
     crate::{
-        game_objects::{game_object::GameObject, player::Player},
-        misc::maze::Maze,
+        game_objects::{floor::Floor, game_object::GameObject, player::Player},
+        world::maze::Maze,
     },
     ggez::{
         event::EventHandler,
         graphics::{Canvas, Color, Image},
+        input::mouse::set_cursor_type,
+        winit::window::CursorIcon,
         Context,
     },
     std::collections::HashMap,
 };
 
 pub struct Game {
-    game_objects: Vec<Box<dyn GameObject>>,
-    textures: HashMap<String, Image>,
     maze: Maze,
+    batches: HashMap<String, InstanceArray>,
 }
 
 impl Game {
     pub fn new(ctx: &mut Context) -> Self {
+        set_cursor_type(ctx, CursorIcon::Crosshair);
+
         let mut game_objects = Vec::<Box<dyn GameObject>>::new();
-        game_objects.push(Box::new(Player::new(ctx)));
+        game_objects.push(Box::new(Player::new()));
 
         let maze = Maze::new(3, 3);
-        maze.print();
 
-        let mut textures = HashMap::new();
-        textures.insert(
-            Player::TEXTURE_ID.to_string(),
-            Image::from_path(
-                &ctx.gfx,
-                format!("\\{}.png", Player::TEXTURE_ID.to_string()),
-            )
-            .unwrap(),
+        let mut batches = HashMap::<String, InstanceArray>::new();
+
+        Self::add_batch(ctx, &mut batches, Player::TEXTURE_ID);
+        Self::add_batch(ctx, &mut batches, Floor::TEXTURE_ID);
+
+        Self { maze, batches }
+    }
+
+    pub fn add_batch(ctx: &Context, batches: &mut HashMap<String, InstanceArray>, tex_id: &str) {
+        let batch = InstanceArray::new(
+            &ctx.gfx,
+            Image::from_path(&ctx.gfx, format!("\\{}.png", tex_id.to_string())).unwrap(),
         );
-
-        Self {
-            game_objects,
-            textures,
-            maze,
-        }
+        batches.insert(tex_id.to_string(), batch);
     }
 }
 
@@ -48,7 +51,7 @@ impl EventHandler<Action> for Game {
     fn update(&mut self, ctx: &mut Context) -> Result<(), Action> {
         let dt = ctx.time.delta().as_secs_f32();
 
-        for obj in self.game_objects.iter_mut() {
+        for obj in self.maze.rooms[1][1].game_objects().unwrap().iter_mut() {
             obj.update(ctx, dt);
         }
 
@@ -58,8 +61,13 @@ impl EventHandler<Action> for Game {
     fn draw(&mut self, ctx: &mut Context) -> Result<(), Action> {
         let mut canvas = Canvas::from_frame(&ctx.gfx, Color::WHITE);
 
-        for obj in self.game_objects.iter_mut() {
-            obj.draw(&mut canvas, self.textures.get(&obj.texture_id()).unwrap());
+        for obj in self.maze.rooms[1][1].game_objects().unwrap().iter_mut() {
+            obj.draw(&mut canvas, self.batches.get_mut(&obj.texture_id()).unwrap());
+        }
+
+        for (.., batch) in self.batches.iter_mut() {
+            canvas.draw(batch, DrawParam::default());
+            batch.clear();
         }
 
         canvas.finish(&mut ctx.gfx).unwrap();

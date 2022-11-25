@@ -6,10 +6,16 @@ mod states {
 
 mod misc {
     pub mod math;
+}
+
+mod world {
     pub mod maze;
+    pub mod room;
+    pub mod spawn;
 }
 
 mod game_objects {
+    pub mod floor;
     pub mod game_object;
     pub mod player;
 }
@@ -32,7 +38,7 @@ fn main() {
     let ctx_builder =
         ContextBuilder::new("Dungeon Game", "Theo Lee and Daniel Li").add_resource_path(path);
 
-    let mode = WindowMode::default().dimensions(1280.0, 720.0);
+    let mode = WindowMode::default().dimensions(App::WIDTH, App::HEIGHT);
     let setup = WindowSetup::default().title("Dungeon Game");
 
     let (mut ctx, e_loop) = ctx_builder

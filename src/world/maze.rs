@@ -1,21 +1,16 @@
+use super::spawn::Spawn;
+
 use {
+    super::room::Room,
     ggez::mint::Point2,
     rand::{thread_rng, Rng},
     std::collections::HashSet,
 };
 
-#[derive(Debug, PartialEq)]
-pub enum Room {
-    Spawn,
-    Base,
-    Null,
-    Void,
-}
-
 pub struct Maze {
     pub width: usize,
     pub height: usize,
-    pub grid: Vec<Vec<Room>>,
+    pub rooms: Vec<Vec<Room>>,
 }
 
 impl Maze {
@@ -24,40 +19,31 @@ impl Maze {
         h = h.clamp(3, 5);
         let spawn_pos = Point2 { x: w / 2, y: h / 2 };
 
-        let mut grid = Vec::<Vec<Room>>::with_capacity(h);
+        let mut rooms = Vec::<Vec<Room>>::with_capacity(h);
 
         for row in 0..h {
-            grid.push(Vec::with_capacity(w));
+            rooms.push(Vec::with_capacity(w));
             for _ in 0..w {
-                grid[row].push(Room::Null);
+                rooms[row].push(Room::Null);
             }
         }
 
-        grid[spawn_pos.y][spawn_pos.x] = Room::Spawn;
+        rooms[spawn_pos.y][spawn_pos.x] = Room::Spawn(Spawn::new(3, 3));
 
         let history = Vec::<Point2<usize>>::new();
         let visited = HashSet::<Point2<usize>>::new();
 
-        Self::generate(&mut grid, history, visited, spawn_pos, false);
+        Self::generate(&mut rooms, history, visited, spawn_pos, false);
 
         Maze {
             width: w,
             height: h,
-            grid,
-        }
-    }
-
-    pub fn print(&self) {
-        for y in 0..self.height {
-            for x in 0..self.width {
-                print!("{:?} ", self.grid[y][x]);
-            }
-            println!();
+            rooms,
         }
     }
 
     fn generate(
-        grid: &mut Vec<Vec<Room>>,
+        rooms: &mut Vec<Vec<Room>>,
         mut history: Vec<Point2<usize>>,
         mut visited: HashSet<Point2<usize>>,
         pos: Point2<usize>,
@@ -68,14 +54,14 @@ impl Maze {
         }
         visited.insert(pos);
 
-        let (w, h) = (grid.len(), grid[0].len());
+        let (w, h) = (rooms.len(), rooms[0].len());
         let Point2 { x, y } = pos;
 
-        if grid[y][x] == Room::Null {
+        if matches!(rooms[y][x], Room::Null) {
             if thread_rng().gen_range(0..3) == 0 {
-                grid[y][x] = Room::Void;
+                rooms[y][x] = Room::Void;
             } else {
-                grid[y][x] = Room::Base;
+                rooms[y][x] = Room::Base;
             }
         }
 
@@ -104,17 +90,17 @@ impl Maze {
 
         if visited.len() == w * h {
             return;
-        } else if grid[y][x] == Room::Void || neighbors.is_empty() {
+        } else if matches!(rooms[y][x], Room::Void) || neighbors.is_empty() {
             history.pop();
 
             if let Some(new_pos) = history.last().cloned() {
-                Self::generate(grid, history, visited, new_pos, true)
+                Self::generate(rooms, history, visited, new_pos, true)
             }
         } else {
             let idx = thread_rng().gen_range(0..neighbors.len());
             let neighbor = neighbors.remove(idx);
 
-            Self::generate(grid, history, visited, neighbor, false)
+            Self::generate(rooms, history, visited, neighbor, false)
         }
     }
 }

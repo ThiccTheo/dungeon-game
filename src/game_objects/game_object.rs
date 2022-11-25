@@ -1,10 +1,10 @@
 use ggez::{
-    graphics::{Canvas, Image},
+    graphics::{Canvas, InstanceArray},
     Context,
 };
 
 pub trait GameObject {
     fn update(&mut self, ctx: &mut Context, dt: f32);
-    fn draw(&mut self, canvas: &mut Canvas, img: &Image);
+    fn draw(&mut self, canvas: &mut Canvas, batch: &mut InstanceArray);
     fn texture_id(&self) -> String;
 }
