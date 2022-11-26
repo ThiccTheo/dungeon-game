@@ -1,7 +1,5 @@
-use super::spawn::Spawn;
-
 use {
-    super::room::Room,
+    super::{room::Room, spawn::Spawn},
     ggez::mint::Point2,
     rand::{thread_rng, Rng},
     std::collections::HashSet,

@@ -1,11 +1,8 @@
-use ggez::graphics::InstanceArray;
-
-use crate::states::app::App;
-
 use {
     super::game_object::GameObject,
+    crate::states::app::App,
     ggez::{
-        graphics::{Canvas, DrawParam, Rect},
+        graphics::{Canvas, DrawParam, InstanceArray, Rect},
         input::keyboard::KeyCode,
         mint::Point2,
         Context,

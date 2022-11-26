@@ -1,8 +1,9 @@
-use ggez::graphics::{DrawParam, InstanceArray, Rect};
-
 use {
     super::game_object::GameObject,
-    ggez::{graphics::Canvas, Context},
+    ggez::{
+        graphics::{Canvas, DrawParam, InstanceArray, Rect},
+        Context,
+    },
 };
 
 pub struct Floor {

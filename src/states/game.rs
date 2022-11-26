@@ -1,5 +1,3 @@
-use ggez::graphics::{InstanceArray, DrawParam};
-
 use {
     super::state::Action,
     crate::{
@@ -8,7 +6,7 @@ use {
     },
     ggez::{
         event::EventHandler,
-        graphics::{Canvas, Color, Image},
+        graphics::{Canvas, Color, DrawParam, Image, InstanceArray},
         input::mouse::set_cursor_type,
         winit::window::CursorIcon,
         Context,
@@ -62,10 +60,13 @@ impl EventHandler<Action> for Game {
         let mut canvas = Canvas::from_frame(&ctx.gfx, Color::WHITE);
 
         for obj in self.maze.rooms[1][1].game_objects().unwrap().iter_mut() {
-            obj.draw(&mut canvas, self.batches.get_mut(&obj.texture_id()).unwrap());
+            obj.draw(
+                &mut canvas,
+                self.batches.get_mut(&obj.texture_id()).unwrap(),
+            );
         }
 
-        for (.., batch) in self.batches.iter_mut() {
+        for batch in self.batches.values_mut() {
             canvas.draw(batch, DrawParam::default());
             batch.clear();
         }

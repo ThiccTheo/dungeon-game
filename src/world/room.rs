@@ -1,6 +1,4 @@
-use crate::game_objects::game_object::GameObject;
-
-use super::spawn::Spawn;
+use {super::spawn::Spawn, crate::game_objects::game_object::GameObject};
 
 pub enum Room {
     Spawn(Spawn),
