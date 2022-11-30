@@ -30,8 +30,8 @@ impl Game {
 
         let mut batches = HashMap::<String, InstanceArray>::new();
 
-        Self::add_batch(ctx, &mut batches, Player::TEXTURE_ID);
-        Self::add_batch(ctx, &mut batches, Floor::TEXTURE_ID);
+        Self::add_batch(ctx, &mut batches, Player::ID);
+        Self::add_batch(ctx, &mut batches, Floor::ID);
 
         Self { maze, batches }
     }
@@ -49,8 +49,11 @@ impl EventHandler<Action> for Game {
     fn update(&mut self, ctx: &mut Context) -> Result<(), Action> {
         let dt = ctx.time.delta().as_secs_f32();
 
-        for obj in self.maze.rooms[1][1].game_objects().unwrap().iter_mut() {
-            obj.update(ctx, dt);
+        for i in 0..self.maze.rooms[1][1].game_objects().unwrap().len() {
+            let (before, tmp) = self.maze.rooms[1][1].game_objects().unwrap().split_at_mut(i);
+            let (this, after) = tmp.split_first_mut().unwrap();
+            let others = before.iter_mut().chain(after.iter_mut());
+            this.update(ctx, dt, others);
         }
 
         Ok(())
@@ -61,8 +64,9 @@ impl EventHandler<Action> for Game {
 
         for obj in self.maze.rooms[1][1].game_objects().unwrap().iter_mut() {
             obj.draw(
+                ctx,
                 &mut canvas,
-                self.batches.get_mut(&obj.texture_id()).unwrap(),
+                self.batches.get_mut(&obj.id()).unwrap(),
             );
         }
 

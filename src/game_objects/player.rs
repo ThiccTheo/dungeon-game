@@ -1,3 +1,5 @@
+use std::{iter::Chain, slice::IterMut};
+
 use {
     super::game_object::GameObject,
     crate::states::app::App,
@@ -16,7 +18,7 @@ pub struct Player {
 }
 
 impl Player {
-    pub const TEXTURE_ID: &str = "player";
+    pub const ID: &str = "player";
 
     pub fn new() -> Self {
         let body = Rect::new(0.0, 0.0, 32.0, 32.0);
@@ -37,7 +39,7 @@ impl Player {
 }
 
 impl GameObject for Player {
-    fn update(&mut self, ctx: &mut Context, dt: f32) {
+    fn update(&mut self, ctx: &mut Context, dt: f32, others: Chain<IterMut<Box<dyn GameObject>>, IterMut<Box<dyn GameObject>>>) {
         let offset = (100.0 * dt).round();
 
         if ctx.keyboard.is_key_pressed(KeyCode::W) {
@@ -63,7 +65,7 @@ impl GameObject for Player {
         }
     }
 
-    fn draw(&mut self, canvas: &mut Canvas, batch: &mut InstanceArray) {
+    fn draw(&mut self, ctx: &mut Context, canvas: &mut Canvas, batch: &mut InstanceArray) {
         canvas.set_screen_coordinates(self.camera.clone());
 
         batch.push(
@@ -80,7 +82,7 @@ impl GameObject for Player {
         );
     }
 
-    fn texture_id(&self) -> String {
-        Self::TEXTURE_ID.to_string()
+    fn id(&self) -> String {
+        Self::ID.to_string()
     }
 }

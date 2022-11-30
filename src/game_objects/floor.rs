@@ -1,3 +1,5 @@
+use std::{iter::Chain, slice::IterMut};
+
 use {
     super::game_object::GameObject,
     ggez::{
@@ -11,7 +13,7 @@ pub struct Floor {
 }
 
 impl Floor {
-    pub const TEXTURE_ID: &str = "floor";
+    pub const ID: &str = "floor";
 
     pub fn new(x: usize, y: usize) -> Self {
         Self {
@@ -21,14 +23,14 @@ impl Floor {
 }
 
 impl GameObject for Floor {
-    fn update(&mut self, _ctx: &mut Context, _dt: f32) {}
+    fn update(&mut self, ctx: &mut Context, dt: f32, others: Chain<IterMut<Box<dyn GameObject>>, IterMut<Box<dyn GameObject>>>) {}
 
-    fn draw(&mut self, canvas: &mut Canvas, batch: &mut InstanceArray) {
+    fn draw(&mut self, ctx: &mut Context, canvas: &mut Canvas, batch: &mut InstanceArray) {
         let sub_rect = batch.image().uv_rect(0, 0, 32, 32);
         batch.push(DrawParam::default().dest(self.body.point()).src(sub_rect));
     }
 
-    fn texture_id(&self) -> String {
-        Self::TEXTURE_ID.to_string()
+    fn id(&self) -> String {
+        Self::ID.to_string()
     }
 }
