@@ -72,7 +72,7 @@ impl Maze {
         }
 
         test_pt = Point2 { x, y: y + 1 };
-        if test_pt.y as i8 <= h as i8 - 1 && !visited.contains(&test_pt) {
+        if (test_pt.y as i8) < (h as i8) && !visited.contains(&test_pt) {
             neighbors.push(test_pt);
         }
 
@@ -82,13 +82,11 @@ impl Maze {
         }
 
         test_pt = Point2 { x: x + 1, y };
-        if test_pt.x as i8 <= w as i8 - 1 && !visited.contains(&test_pt) {
+        if (test_pt.x as i8) < (w as i8) && !visited.contains(&test_pt) {
             neighbors.push(test_pt);
         }
 
-        if visited.len() == w * h {
-            return;
-        } else if matches!(rooms[y][x], Room::Void) || neighbors.is_empty() {
+        if matches!(rooms[y][x], Room::Void) || neighbors.is_empty() {
             history.pop();
 
             if let Some(new_pos) = history.last().cloned() {

@@ -1,7 +1,5 @@
-use std::{iter::Chain, slice::IterMut};
-
 use {
-    super::game_object::GameObject,
+    super::game_object::{GameObject, View},
     ggez::{
         graphics::{Canvas, DrawParam, InstanceArray, Rect},
         Context,
@@ -23,14 +21,14 @@ impl Floor {
 }
 
 impl GameObject for Floor {
-    fn update(&mut self, ctx: &mut Context, dt: f32, others: Chain<IterMut<Box<dyn GameObject>>, IterMut<Box<dyn GameObject>>>) {}
+    fn update(&mut self, _ctx: &mut Context, _dt: f32, _others: View) {}
 
-    fn draw(&mut self, ctx: &mut Context, canvas: &mut Canvas, batch: &mut InstanceArray) {
+    fn draw(&mut self, _ctx: &mut Context, _canvas: &mut Canvas, batch: &mut InstanceArray) {
         let sub_rect = batch.image().uv_rect(0, 0, 32, 32);
         batch.push(DrawParam::default().dest(self.body.point()).src(sub_rect));
     }
 
-    fn id(&self) -> String {
-        Self::ID.to_string()
+    fn id(&self) -> &'static str {
+        Self::ID
     }
 }

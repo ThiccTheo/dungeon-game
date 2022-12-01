@@ -4,10 +4,6 @@ mod states {
     pub mod state;
 }
 
-mod misc {
-    pub mod math;
-}
-
 mod world {
     pub mod maze;
     pub mod room;
@@ -31,8 +27,7 @@ use {
 };
 
 fn main() {
-    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let mut path = root.clone();
+    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.push("assets\\images");
 
     let ctx_builder =
