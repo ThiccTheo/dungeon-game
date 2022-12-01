@@ -1,13 +1,14 @@
 use {
     super::state::Action,
     crate::{
-        game_objects::{floor::Floor, player::Player},
+        game_objects::{floor::Floor, game_object::create_view, player::Player},
         world::maze::Maze,
     },
     ggez::{
         event::EventHandler,
         graphics::{Canvas, Color, DrawParam, Image, InstanceArray},
         input::mouse::set_cursor_type,
+        mint::Point2,
         winit::window::CursorIcon,
         Context,
     },
@@ -17,6 +18,7 @@ use {
 pub struct Game {
     maze: Maze,
     batches: HashMap<&'static str, InstanceArray>,
+    room_indices: Point2<usize>,
 }
 
 impl Game {
@@ -24,13 +26,18 @@ impl Game {
         set_cursor_type(ctx, CursorIcon::Crosshair);
 
         let maze = Maze::new(3, 3);
+        let room_indices = Point2 { x: 1, y: 1 };
 
         let mut batches = HashMap::<&'static str, InstanceArray>::new();
 
         Self::add_batch(ctx, &mut batches, Player::ID);
         Self::add_batch(ctx, &mut batches, Floor::ID);
 
-        Self { maze, batches }
+        Self {
+            maze,
+            batches,
+            room_indices,
+        }
     }
 
     pub fn add_batch(
@@ -50,13 +57,10 @@ impl EventHandler<Action> for Game {
     fn update(&mut self, ctx: &mut Context) -> Result<(), Action> {
         let dt = ctx.time.delta().as_secs_f32();
 
-        for i in 0..self.maze.rooms[1][1].game_objects().unwrap().len() {
-            let (before, tmp) = self.maze.rooms[1][1]
-                .game_objects()
-                .unwrap()
-                .split_at_mut(i);
-            let (this, after) = tmp.split_first_mut().unwrap();
-            let others = before.iter_mut().chain(after.iter_mut());
+        let cur_room = &mut self.maze.rooms[self.room_indices.y][self.room_indices.x];
+
+        for i in 0..cur_room.game_objects().unwrap().len() {
+            let (this, others) = create_view(cur_room.game_objects().unwrap(), i);
             this.update(ctx, dt, others);
         }
 
@@ -66,7 +70,9 @@ impl EventHandler<Action> for Game {
     fn draw(&mut self, ctx: &mut Context) -> Result<(), Action> {
         let mut canvas = Canvas::from_frame(&ctx.gfx, Color::WHITE);
 
-        for obj in self.maze.rooms[1][1].game_objects().unwrap().iter_mut() {
+        let cur_room = &mut self.maze.rooms[self.room_indices.y][self.room_indices.x];
+
+        for obj in cur_room.game_objects().unwrap().iter_mut() {
             obj.draw(ctx, &mut canvas, self.batches.get_mut(&obj.id()).unwrap());
         }
 
